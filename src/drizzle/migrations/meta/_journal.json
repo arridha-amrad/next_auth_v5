@@ -8,6 +8,13 @@
       "when": 1716481859337,
       "tag": "0000_breezy_madripoor",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1716544227780,
+      "tag": "0001_blue_nomad",
+      "breakpoints": true
     }
   ]
 }

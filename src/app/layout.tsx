@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { ThemeProvider } from "~/components/theme-provider";
 import Navbar from "~/components/Navbar";
 import { Toaster } from "~/components/ui/toaster";
+import { SessionProvider } from "next-auth/react";
 
 const inter = FontSans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -19,19 +20,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html suppressHydrationWarning lang="en">
       <body
         className={clsx(
           inter.variable,
           "min-h-screen bg-background py-4 font-sans antialiased"
         )}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Navbar />
-          <div className="h-10" />
-          {children}
-          <Toaster />
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <Navbar />
+            <div className="h-10" />
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );
