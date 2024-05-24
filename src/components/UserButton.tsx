@@ -7,7 +7,10 @@ async function UserButton() {
   return (
     <section className="flex gap-2 items-center px-4">
       <Avatar>
-        <AvatarImage src={session?.user.avatar ?? undefined} />
+        <AvatarImage
+          className="object-cover"
+          src={session?.user.avatar ?? undefined}
+        />
         <AvatarFallback>
           {session?.user.name
             ?.split(" ")
