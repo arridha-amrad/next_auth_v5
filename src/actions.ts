@@ -1,7 +1,7 @@
 "use server";
 
 import db from "./drizzle/db";
-import { UsersTable } from "./drizzle/schema";
+import { DbsUsersTable, UsersTable } from "./drizzle/schema";
 import argon from "argon2";
 import getSession from "./utils/getSession";
 import { eq } from "drizzle-orm";
@@ -10,7 +10,7 @@ type TSignup = {
   name: string;
   email: string;
   password: string;
-  imgUrl: string;
+  image: string;
 };
 
 type TSignin = {
@@ -37,30 +37,33 @@ export const signinAction = async (data: FormData) => {
     id: user[0].id,
     name: user[0].name,
     email: user[0].email,
-    imgUrl: user[0].imgUrl,
+    image: user[0].imgUrl,
   };
 };
 
 export const signupAction = async (data: FormData) => {
-  const { email, imgUrl, name, password } = Object.fromEntries(
+  const { email, image, name, password } = Object.fromEntries(
     data.entries()
   ) as TSignup;
 
-  if (!email || !imgUrl || !name || !password) {
+  if (!email || !image || !name || !password) {
     throw new Error("Please fill the required input");
   }
-
   const hashedPassword = await argon.hash(password);
+  const isEmailRegistered = await db
+    .select()
+    .from(DbsUsersTable)
+    .where(eq(DbsUsersTable.email, email));
 
-  await db.insert(UsersTable).values({
+  if (isEmailRegistered.length > 0) {
+    throw new Error("Email has been registered");
+  }
+
+  await db.insert(DbsUsersTable).values({
     email,
-    imgUrl,
+    image,
     name,
     password: hashedPassword,
-  });
-
-  await new Promise((res, rej) => {
-    return setTimeout(res, 3000);
   });
 };
 

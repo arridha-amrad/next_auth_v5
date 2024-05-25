@@ -58,7 +58,7 @@ const SignupForm = () => {
           </div>
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="imgUrl">Avatar</Label>
-            <Input type="text" id="imgUrl" name="imgUrl" />
+            <Input type="text" id="imgUrl" name="image" />
           </div>
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="password">Password</Label>

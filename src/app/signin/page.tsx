@@ -2,7 +2,7 @@ import SigninForm from "~/components/Form/SigninForm";
 import GithubLoginButton from "~/components/GithubLoginBtn";
 import GoogleLoginButton from "~/components/GoogleLoginBtn";
 
-function Page() {
+async function Page() {
   return (
     <main className="w-full flex items-center justify-center">
       <div className="w-full max-w-md">

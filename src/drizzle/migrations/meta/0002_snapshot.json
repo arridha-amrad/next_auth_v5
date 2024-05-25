@@ -1,6 +1,6 @@
 {
-  "id": "0b67824e-8756-40a3-b9bb-352e4492cab4",
-  "prevId": "bd94489d-f2e4-4581-be04-6604a69db539",
+  "id": "822e8a80-baf1-4473-899c-afe05460613b",
+  "prevId": "0b67824e-8756-40a3-b9bb-352e4492cab4",
   "version": "6",
   "dialect": "postgresql",
   "tables": {
@@ -208,15 +208,7 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "user_email_unique": {
-          "name": "user_email_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     },
     "public.verificationToken": {
       "name": "verificationToken",

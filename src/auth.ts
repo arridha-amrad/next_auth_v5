@@ -1,86 +1,72 @@
 import NextAuth, { User } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-
 import Credentials from "next-auth/providers/credentials";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
+
 import db from "./drizzle/db";
-import { UsersTable } from "./drizzle/schema";
-import { eq } from "drizzle-orm";
+import {
+  DbsAccountsTable,
+  DbsSessionsTable,
+  DbsUsersTable,
+  DbsVerificationTokensTable,
+} from "./drizzle/schema";
 
 export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
+  session: {
+    strategy: "database",
+  },
+  adapter: DrizzleAdapter(db, {
+    accountsTable: DbsAccountsTable,
+    usersTable: DbsUsersTable,
+    sessionsTable: DbsSessionsTable,
+    verificationTokensTable: DbsVerificationTokensTable,
+  }),
   pages: {
     signIn: "/signin",
   },
   providers: [
     GitHub,
-    Google({
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
-        },
-      },
-    }),
+    Google,
     Credentials({
-      authorize: async (credentials: any) => {
-        const user: User = {
-          id: credentials.id,
-          name: credentials.name,
-          email: credentials.email,
-          role: "BASIC",
-          avatar: credentials.imgUrl,
-          image: credentials.imgUrl,
-        };
-        return user;
+      async authorize(credentials: any) {
+        let user: User | null = null;
+        try {
+          const res = await fetch(
+            "http://localhost:3000/api/credentials-login",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+          if (!res.ok) {
+            return null;
+          }
+          const data = await res.json();
+          user = data.user;
+        } catch (err) {
+          throw err;
+        } finally {
+          return user;
+        }
       },
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
-      if (account?.type === "credentials") {
-        return true;
-      }
-      const { email: em, name, image } = user;
-      if (em && name && image) {
-        await db
-          .insert(UsersTable)
-          .values({
-            email: em,
-            imgUrl: image,
-            name,
-            password: "",
-            provider: account?.provider,
-          })
-          .onConflictDoNothing();
-        return true;
-      } else {
-        return "/signin?e=invalid credentials";
-      }
-    },
-    async jwt({ token, user, trigger, session }) {
-      if (user && user.email) {
-        const dbUser = await db
-          .select({
-            id: UsersTable.id,
-            name: UsersTable.name,
-            email: UsersTable.email,
-            avatar: UsersTable.imgUrl,
-          })
-          .from(UsersTable)
-          .where(eq(UsersTable.email, user.email));
-        token.user = { ...dbUser[0] };
-      }
-
-      if (trigger === "update" && session) {
-        token = { ...token, user: session };
-        return token;
-      }
-
-      return token;
-    },
-    async session({ session, token, trigger }) {
-      session.user = token.user as any;
+    async session({ session, user }) {
+      // @ts-ignore
+      session.user = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        image: user.image,
+        name: user.name,
+        createdAt: user.createdAt,
+      };
       return session;
     },
   },

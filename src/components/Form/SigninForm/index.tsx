@@ -1,6 +1,4 @@
-"use client";
-
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import {
@@ -13,34 +11,28 @@ import {
 import { Checkbox } from "~/components/ui/checkbox";
 import SigninSubmitButton from "./SigninSubmitBtn";
 import { useToast } from "~/components/ui/use-toast";
-import { signinAction } from "~/actions";
-import { signIn } from "next-auth/react";
+import { signIn } from "~/auth";
+import { RedirectType, redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect";
 
 type Props = {
   children: ReactNode;
 };
 
 const SigninForm = ({ children }: Props) => {
-  const [isShow, setIsShow] = useState(false);
-  const { toast } = useToast();
+  // const [isShow, setIsShow] = useState(false);
+  // const { toast } = useToast();
 
   const action = async (data: FormData) => {
-    try {
-      const result = await signinAction(data);
-      const formData = new FormData();
-      Object.keys(result).map((key) =>
-        // @ts-ignore
-        formData.append(key, result[key])
-      );
-      await signIn("credentials", { ...result, callbackUrl: "/" });
-    } catch (err: any) {
-      console.log(err);
-      console.log(err.message);
-      toast({
-        title: "Uh oh! Something went wrong.",
-        description: err.message,
-      });
-    }
+    "use server";
+
+    await signIn("credentials", data);
+    redirect("/");
+    // console.log(err.message);
+    // toast({
+    //   title: "Uh oh! Something went wrong.",
+    //   description: err.message,
+    // });
   };
 
   return (
@@ -57,13 +49,9 @@ const SigninForm = ({ children }: Props) => {
           </div>
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="password">Password</Label>
-            <Input
-              type={isShow ? "text" : "password"}
-              id="password"
-              name="password"
-            />
+            <Input type={"password"} id="password" name="password" />
           </div>
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             <Checkbox
               checked={isShow}
               onCheckedChange={() => setIsShow((val) => !val)}
@@ -75,7 +63,7 @@ const SigninForm = ({ children }: Props) => {
             >
               Show password
             </label>
-          </div>
+          </div> */}
           <SigninSubmitButton />
         </form>
         <div className="pt-10 flex gap-2 items-center justify-center">
