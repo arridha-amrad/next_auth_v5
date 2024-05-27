@@ -53,14 +53,11 @@ export const signupAction = async (data: FormData) => {
   const hashedPassword = await argon.hash(password);
 
   await db.insert(UsersTable).values({
+    provider: "credentials",
     email,
     imgUrl,
     name,
     password: hashedPassword,
-  });
-
-  await new Promise((res, rej) => {
-    return setTimeout(res, 3000);
   });
 };
 

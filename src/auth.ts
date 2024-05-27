@@ -60,7 +60,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
     },
     async jwt({ token, user, trigger, session }) {
       if (user && user.email) {
-        const dbUser = await db
+        const [dbUser] = await db
           .select({
             id: UsersTable.id,
             name: UsersTable.name,
@@ -69,7 +69,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
           })
           .from(UsersTable)
           .where(eq(UsersTable.email, user.email));
-        token.user = { ...dbUser[0] };
+        token.user = { ...dbUser };
       }
 
       if (trigger === "update" && session) {
@@ -77,10 +77,13 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         return token;
       }
 
+      console.log({ token });
+
       return token;
     },
     async session({ session, token, trigger }) {
       session.user = token.user as any;
+      console.log({ session });
       return session;
     },
   },
