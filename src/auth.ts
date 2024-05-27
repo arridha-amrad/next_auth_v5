@@ -28,8 +28,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
           id: credentials.id,
           name: credentials.name,
           email: credentials.email,
-          role: "BASIC",
-          avatar: credentials.imgUrl,
+          role: credentials.role,
           image: credentials.imgUrl,
         };
         return user;
@@ -76,14 +75,10 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
         token = { ...token, user: session };
         return token;
       }
-
-      console.log({ token });
-
       return token;
     },
-    async session({ session, token, trigger }) {
+    async session({ session, token }) {
       session.user = token.user as any;
-      console.log({ session });
       return session;
     },
   },

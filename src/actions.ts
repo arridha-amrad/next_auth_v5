@@ -5,6 +5,9 @@ import { UsersTable } from "./drizzle/schema";
 import argon from "argon2";
 import getSession from "./utils/getSession";
 import { eq } from "drizzle-orm";
+import { signIn } from "./auth";
+import { User } from "next-auth";
+import { redirect } from "next/navigation";
 
 type TSignup = {
   name: string;
@@ -20,25 +23,30 @@ type TSignin = {
 
 export const signinAction = async (data: FormData) => {
   const { email, password } = Object.fromEntries(data.entries()) as TSignin;
-  const user = await db
+  const [user] = await db
     .select()
     .from(UsersTable)
     .where(eq(UsersTable.email, email));
 
-  if (user.length === 0) {
+  if (!user) {
     throw new Error("User not found");
   }
 
-  const isMatch = await argon.verify(user[0].password, password);
+  const isMatch = await argon.verify(user.password, password);
   if (!isMatch) {
     throw new Error("Password not match");
   }
-  return {
-    id: user[0].id,
-    name: user[0].name,
-    email: user[0].email,
-    imgUrl: user[0].imgUrl,
+
+  const myUser: User = {
+    id: user.id.toString(),
+    name: user.name,
+    email: user.email,
+    image: user.imgUrl,
+    role: "BASIC",
   };
+
+  await signIn("credentials", { ...myUser, redirect: false });
+  redirect("/");
 };
 
 export const signupAction = async (data: FormData) => {

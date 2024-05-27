@@ -14,7 +14,6 @@ import { Checkbox } from "~/components/ui/checkbox";
 import SigninSubmitButton from "./SigninSubmitBtn";
 import { useToast } from "~/components/ui/use-toast";
 import { signinAction } from "~/actions";
-import { signIn } from "next-auth/react";
 
 type Props = {
   children: ReactNode;
@@ -26,13 +25,7 @@ const SigninForm = ({ children }: Props) => {
 
   const action = async (data: FormData) => {
     try {
-      const result = await signinAction(data);
-      const formData = new FormData();
-      Object.keys(result).map((key) =>
-        // @ts-ignore
-        formData.append(key, result[key])
-      );
-      await signIn("credentials", { ...result, callbackUrl: "/" });
+      await signinAction(data);
     } catch (err: any) {
       console.log(err);
       console.log(err.message);

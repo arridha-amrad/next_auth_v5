@@ -7,6 +7,5 @@ declare module "next-auth" {
 
   interface User {
     role: string | null;
-    avatar?: string | null;
   }
 }
