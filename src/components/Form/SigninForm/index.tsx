@@ -27,8 +27,6 @@ const SigninForm = ({ children }: Props) => {
     try {
       await signinAction(data);
     } catch (err: any) {
-      console.log(err);
-      console.log(err.message);
       toast({
         title: "Uh oh! Something went wrong.",
         description: err.message,

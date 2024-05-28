@@ -3,13 +3,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 async function UserButton() {
   const session = await getSession();
+
   if (!session) return null;
   return (
     <section className="flex gap-2 items-center px-4">
       <Avatar>
         <AvatarImage
           className="object-cover"
-          src={session?.user.avatar ?? undefined}
+          src={session?.user.image ?? undefined}
         />
         <AvatarFallback>
           {session?.user.name

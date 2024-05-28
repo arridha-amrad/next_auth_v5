@@ -42,8 +42,10 @@ export const signinAction = async (data: FormData) => {
     name: user.name,
     email: user.email,
     image: user.imgUrl,
-    role: "BASIC",
+    role: user.role,
   };
+
+  console.log("my user : ", myUser);
 
   await signIn("credentials", { ...myUser, redirect: false });
   redirect("/");
@@ -84,7 +86,8 @@ export const updateUser = async (data: FormData) => {
       id: UsersTable.id,
       name: UsersTable.name,
       email: UsersTable.email,
-      avatar: UsersTable.imgUrl,
+      image: UsersTable.imgUrl,
+      role: UsersTable.role,
     });
   return result;
 };

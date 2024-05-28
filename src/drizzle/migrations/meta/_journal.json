@@ -15,6 +15,13 @@
       "when": 1716544227780,
       "tag": "0001_blue_nomad",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1716881710385,
+      "tag": "0002_mighty_jack_murdock",
+      "breakpoints": true
     }
   ]
 }
