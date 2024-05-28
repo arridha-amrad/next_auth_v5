@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import {
@@ -14,25 +14,30 @@ import { Checkbox } from "~/components/ui/checkbox";
 import SigninSubmitButton from "./SigninSubmitBtn";
 import { useToast } from "~/components/ui/use-toast";
 import { signinAction } from "~/actions";
+import { useFormState } from "react-dom";
 
 type Props = {
   children: ReactNode;
+};
+
+const initialState = {
+  errMsg: "",
 };
 
 const SigninForm = ({ children }: Props) => {
   const [isShow, setIsShow] = useState(false);
   const { toast } = useToast();
 
-  const action = async (data: FormData) => {
-    try {
-      await signinAction(data);
-    } catch (err: any) {
+  const [state, formAction] = useFormState(signinAction, initialState);
+
+  useEffect(() => {
+    if (state.errMsg) {
       toast({
         title: "Uh oh! Something went wrong.",
-        description: err.message,
+        description: state.errMsg,
       });
     }
-  };
+  }, [state.errMsg]);
 
   return (
     <Card className="px-4 py-2">
@@ -41,7 +46,7 @@ const SigninForm = ({ children }: Props) => {
         <CardDescription>Fill the form to sign you in</CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4" action={action}>
+        <form className="space-y-4" action={formAction}>
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="email">Email</Label>
             <Input type="text" id="email" name="email" />

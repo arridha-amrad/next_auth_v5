@@ -20,6 +20,7 @@ const createToken = (token: JWT, user: User) => {
 };
 
 export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
+  trustHost: true,
   session: {
     strategy: "jwt",
   },
@@ -74,8 +75,6 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
     },
     async jwt({ token, user, trigger, session, account }) {
       if (user && user.email) {
-        console.log("jwt user : ", user);
-
         if (account && account.provider !== "credentials") {
           const [dbUser] = await db
             .select({

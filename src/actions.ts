@@ -21,7 +21,7 @@ type TSignin = {
   password: string;
 };
 
-export const signinAction = async (data: FormData) => {
+export const signinAction = async (prevState: any, data: FormData) => {
   const { email, password } = Object.fromEntries(data.entries()) as TSignin;
   const [user] = await db
     .select()
@@ -29,12 +29,16 @@ export const signinAction = async (data: FormData) => {
     .where(eq(UsersTable.email, email));
 
   if (!user) {
-    throw new Error("User not found");
+    return {
+      errMsg: "User not found",
+    };
   }
 
   const isMatch = await argon.verify(user.password, password);
   if (!isMatch) {
-    throw new Error("Password not match");
+    return {
+      errMsg: "Password not match",
+    };
   }
 
   const myUser: User = {
@@ -44,8 +48,6 @@ export const signinAction = async (data: FormData) => {
     image: user.imgUrl,
     role: user.role,
   };
-
-  console.log("my user : ", myUser);
 
   await signIn("credentials", { ...myUser, redirect: false });
   redirect("/");
